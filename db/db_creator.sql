@@ -1,11 +1,16 @@
-DROP DATABASE IF EXISTS Python
+DROP DATABASE IF EXISTS Python;
 
 CREATE DATABASE Python;
 
 USE Python;
 
-
+DROP TABLE IF EXISTS Search;
 DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Product;
+
+-- -------------
+-- 3 tables ----
+-- -------------
 CREATE TABLE User (
     id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
     pseudo char(100) NOT NULL UNIQUE,
@@ -14,7 +19,7 @@ CREATE TABLE User (
 )ENGINE = INNODB;
 
 
-DROP TABLE IF EXISTS Product;
+
 CREATE TABLE Product (
     id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
     category VARCHAR(60) NOT NULL,
@@ -37,16 +42,13 @@ CREATE TABLE Product (
     PRIMARY KEY (id)
 )ENGINE = INNODB;
 
-
-DROP TABLE IF EXISTS Search;
+-- la dernière porte les clés étangères
 CREATE TABLE Search (
     user_id SMALLINT UNSIGNED NOT NULL,
-    substitute_id SMALLINT UNSIGNED NOT NULL,
+    product_id SMALLINT UNSIGNED NOT NULL,
     day_date TIMESTAMP,
-    category CHAR(100) NOT NULL,
-    product_name CHAR(100) NOT NULL,
     criterion INT,
-    PRIMARY KEY (user_id, substitute_id),
-    CONSTRAINT fk_sub_id FOREIGN KEY (substitute_id) REFERENCES Product(id),
-    CONSTRAINT fk_usr_id FOREIGN KEY (user_id) REFERENCES User(id)
+    PRIMARY KEY (user_id, product_id),
+    CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES Product(id),
+    CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES User(id)
 )ENGINE = INNODB;
