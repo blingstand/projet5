@@ -5,7 +5,10 @@
     I want to make them discover that for each product they have the same product
     with a label "bio". Respecting environnement is possible.
 """
-import os, sys, webbrowser, time
+import os
+import sys
+import webbrowser
+import time
 
 import modules.user as us
 import modules.database as db
@@ -20,7 +23,7 @@ def main():
     # " de vous montrer que parmi des produits du quotidien vous pouvez trouver un "\
     # "substitut dont la fabrication est respectueuse de l'environnement.\n")
 
-    my_user = us.User()
+    my_user = us.User("adi", "123", True)
     # input(my_user.id)
     loop = True
     while loop:

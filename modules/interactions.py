@@ -21,11 +21,12 @@ class Interactions():
         print("\n", "-"*30, " PAGE DE RECHERCHE ", "-"*30)
         print(".... {} \n".format(msg))
 
-    def input_cat_prod(self, wanted, my_liste):
+    def input_cat_prod(self, wanted, my_list):
         """ Lets the user choose a cat """
         print("Ecrivez un nombre pour choisir votre {} :".format(wanted))
         count = 1
-        for i in my_liste:
+
+        for i in my_list:
             print("\t{} -> {}".format(count, i))
             count +=1
         print("** ** "*9)

@@ -46,6 +46,7 @@ CREATE TABLE Product (
 CREATE TABLE Search (
     user_id SMALLINT UNSIGNED NOT NULL,
     product_id SMALLINT UNSIGNED NOT NULL,
+    substitute_id SMALLINT UNSIGNED NOT NULL,
     day_date TIMESTAMP,
     criterion INT,
     PRIMARY KEY (user_id, product_id),

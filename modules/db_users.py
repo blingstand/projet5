@@ -4,6 +4,7 @@ import os
 import time
 import mysql.connector
 import modules.database as db
+import modules.interactions as interactions
 
 
 
@@ -12,6 +13,11 @@ def negatif_feed_back(msg):
     print("\n", msg, "\n")
     time.sleep(1)
 
+def page(title, *supp):
+    os.system("cls")
+    print("\n", "-"*30, " PAGE {} ".format(title), "-"*30, "\n")
+    if supp:
+        print("- - - - {} - - - -".format(supp))
 class DbUser(db.Database):
     """class that manage the _connection to the database and the fonction related to db"""
 
@@ -74,9 +80,8 @@ class DbUser(db.Database):
                         #exits the inscription function
                         user.connected = "Exit"
                         return user
-                    else:
-                        negatif_feed_back("Je n'ai pas compris.")
-                        continue
+                    negatif_feed_back("Je n'ai pas compris.")
+                    continue
             user.pseudo = input("\n  Pseudo : ")
             user.password = input("  Mot de passe : ")
 
@@ -142,8 +147,7 @@ class DbUser(db.Database):
         """
 
         while not user.connected:
-            os.system("cls")
-            print("\n", "-"*30, " PAGE D'AUTHENTIFICATION ", "-"*30, "\n")
+            page("D'AUTHENTIFICATION")
 
             #the question
             new = input("Il faut vous connecter : \n  1 - Inscription,\n "\
@@ -151,9 +155,8 @@ class DbUser(db.Database):
 
             #condition
             if new in ("1", ""):
-                os.system("cls")
-                print("\n", "-"*30, " PAGE D'AUTHENTIFICATION ", "-"*30, "\n")
-                print("- - - - Inscription - - - -")
+                page("D'AUTHENTIFICATION", "inscription")
+
                 user = self._registration(user)
                 #to manage the exit option and remain user.connected False
                 if user.connected == "Exit":
@@ -162,8 +165,7 @@ class DbUser(db.Database):
 
             elif new == "2":
                 os.system("cls")
-                print("\n", "-"*30, " PAGE D'AUTHENTIFICATION ", "-"*30, "\n")
-                print("- - - - Connexion - - - -")
+                page("D'AUTHENTIFICATION", "connexion")
                 user = self._connection(user)
                 if user.connected == "Exit":
                     user.connected = False
@@ -181,16 +183,16 @@ class DbUser(db.Database):
         """ Permits to display the previous search.name connected to a given pseudo """
 
         os.system("cls")
-        print("\n", "-"*30, " PAGE DE L'HISTORIQUE DE RECHERCHE ", "-"*30, "\n")
+        page("D'HISTORIQUE DE RECHERCHE")
         print("Voici les précédentes recherches que vous avez effectuées : \n")
 
         try:
             sql = """SELECT DATE_FORMAT(Search.day_date, '%c-%b-%y %H:%i'),
-                            Search.category,
-                            Search.product_name,
+                            Product.category,
+                            Product.name,
                             Search.criterion,
-                            Product.name FROM Search
-            INNER JOIN Product ON Search.substitute_id = Product.id
+                            (SELECT Product.name FROM Product WHERE id = Search.substitute_id) FROM Search
+            INNER JOIN Product ON Search.product_id = Product.id
             WHERE Search.user_id = '{}' ORDER BY 'date' DESC;""".format(user.id)
 
             self.my_cursor.execute(sql)
@@ -207,8 +209,8 @@ class DbUser(db.Database):
                 chain += "\n"
 
             return chain
-        except Exception as e:
-            raise e
+        except Exception as error:
+            raise error
 
     def get_more_info(self, user):
         """User chooses a prod or a sub and give 1 word (or more), functions makes a search"""
