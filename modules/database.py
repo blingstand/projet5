@@ -12,9 +12,8 @@ import mysql.connector
 from modules.interactions import Interactions
 from config import Config
 
-
 class Database(Interactions):
-    """ This class use mysql to get informations """
+    """ This class uses mysql to get informations """
     TUP_MIF = ("france", "France")
     TUP_BIO_LABELS = ("Bio", "Bio européen", "FR-BIO-01", "AB Agriculture Biologique", \
         "Eco-Emballages", "Organic", "EU Organic")
@@ -29,7 +28,6 @@ class Database(Interactions):
         )
         self.my_cursor = self.mydb.cursor()
 
-    # ******************************************* SELECT PROD
     def _get_prod_from_cat(self, cat):
         """ returns prod from db found with a given category and gathers them in list """
 
@@ -58,9 +56,6 @@ class Database(Interactions):
 
         return answer
 
-
-    # *******************************************GET INFOS ABOUT SEL_PROD
-
     def _get_info_selected_prod(self, name_selected_prod, info):
         """Returns the asked info of a given prod """
         sql = 'select {} from product where name = "{}";'\
@@ -84,8 +79,6 @@ class Database(Interactions):
             return False
         except:
             return False
-
-    # *******************************************HEALTHY FOOD
 
     def __find_list_low_ns(self, cat, name_selected_prod):
         """ Returns a list of prod with the lowest letter for nbs
@@ -158,9 +151,6 @@ class Database(Interactions):
             return True, my_prod_healthier[1], my_prod_healthier[2], my_prod_healthier[3]
         return False, substitute, lower_ns, lower_na
 
-
-    # *******************************************RESPOnsIBLE FOOD
-
     def _get_resp_sub(self, cat, name_selected_prod, info_for_sql, my_list):
         """Return a responsible sub according with info_for_sql"""
 
@@ -204,7 +194,6 @@ class Database(Interactions):
 
         return substitute, precision
 
-    # *******************************************COMPARISON
     def _display_answer(self, cat, name_selected_prod, criterion):
         """ Tries to find a substitute based on criterion
 
@@ -287,8 +276,8 @@ class Database(Interactions):
             self.mydb.commit()
             print("... recherche enregistrée ...")
         else:
-            sql = "UPDATE Search SET day_date = '{}' WHERE substitute_id = {} AND criterion = {};".\
-            format(timestamp, substitute_id, criterion)
+            sql = "UPDATE Search SET day_date = '{}' WHERE product_id = {} AND substitute_id = {} "\
+            "AND criterion = {};".format(timestamp, substitute_id, criterion)
             self.my_cursor.execute(sql)
             self.mydb.commit()
             print("... historique de recherche mise à jour ...")
@@ -347,8 +336,6 @@ class Database(Interactions):
         if my_user.connected:
             self._save_search(cat, name_selected_prod, sub, my_user, criterion)
 
-
-    # *******************************************DISPLAY SHEET PROD
     def display_more_info_about_product(self, name_selected_prod):
         """ Displays informations about selected prod comming from the db """
         sql = 'SELECT url from Product WHERE name = "{}";'.format(name_selected_prod)

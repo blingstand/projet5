@@ -51,5 +51,16 @@ CREATE TABLE Search (
     criterion INT,
     PRIMARY KEY (user_id, product_id),
     CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES Product(id),
+    CONSTRAINT fk_sub_id FOREIGN KEY (substitute_id) REFERENCES Product(id),
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES User(id)
 )ENGINE = INNODB;
+
+
+
+
+SELECT DATE_FORMAT(Search.day_date, '%c-%b-%y %H:%i') AS date,
+prod.category, prod.name as product, Search.criterion, sub.name as substitute
+FROM Search
+    INNER JOIN Product AS prod ON Search.product_id = prod.id
+    INNER JOIN Product AS sub ON Search.substitute_id = sub.id
+WHERE Search.user_id = {} ORDER BY 'date' DESC;

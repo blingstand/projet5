@@ -2,6 +2,7 @@
 from modules.database import Database
 
 class User(Database):
+    """ This class creates a user object needed for the main.py"""
 
     def __init__(self, pseudo="", password="", connected=False, id=""):
         super().__init__()

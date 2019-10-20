@@ -23,7 +23,7 @@ def main():
     # " de vous montrer que parmi des produits du quotidien vous pouvez trouver un "\
     # "substitut dont la fabrication est respectueuse de l'environnement.\n")
 
-    my_user = us.User("adi", "123", True)
+    my_user = us.User()
     # input(my_user.id)
     loop = True
     while loop:
@@ -47,7 +47,6 @@ def main():
                 "  2 - Remplacer un aliment, \n"\
                 "  3 - Retrouver mes aliments substitués,\n"\
                 "  4 - Quitter.\n ->")
-##################################################################################### 1
         if answer == "1":
             #depend on my_user.connected
             if my_user.connected:
@@ -58,7 +57,6 @@ def main():
                 my_db = dbu.DbUser()
                 my_user = my_db.authentication(my_user)
 
-##################################################################################### 2
         elif answer == "2":
             # if not my_user.connected:
             #     my_db = dbu.DbUser()
@@ -93,9 +91,6 @@ def main():
                 else:
                     break
 
-
-##################################################################################### 3
-
         elif answer == "3":
             my_db = dbu.DbUser()
             if not my_user.connected:
@@ -111,13 +106,12 @@ def main():
             print(chain)
             input("Appuyez sur 'entrer' pour revenir au menu principal.")
 
-
-##################################################################################### 4
         elif answer == "4":
             print("A bientôt !")
             time.sleep(1)
             os.system("cls")
             sys.exit(2)
+
         else:
             print("Je n'ai pas compris.")
 

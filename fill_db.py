@@ -2,7 +2,7 @@
 # -> pip install git+https://github.com/openfoodfacts/openfoodfacts-python
 """
     Maintenant ma base est remplie par 380 lignes
-
+amélior : #dico key : value kick duplicate
 """
 import sys
 from datetime import datetime
@@ -75,7 +75,7 @@ class FillDb():
         list_prod = []
 
         for prod in my_list: #selects prod from list of products
-            name = prod["product_name"].lower()
+            name = prod["product_name"].lower() #dico key : value
             if name not in list_prod_name: #anti-duplicate name
                 list_prod_name.append(name)
                 list_prod.append(prod)
@@ -182,7 +182,6 @@ def main():
     before = datetime.now()
     products = FillDb()
     can_fill = products.check_before_fill()
-    can_fill = True
 
     if not can_fill:
         print("Erreur > La base est déjà remplie.")

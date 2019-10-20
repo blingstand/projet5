@@ -3,8 +3,7 @@
 import os
 import time
 import mysql.connector
-import modules.database as db
-import modules.interactions as interactions
+from modules.database import Database
 
 
 
@@ -13,16 +12,18 @@ def negatif_feed_back(msg):
     print("\n", msg, "\n")
     time.sleep(1)
 
-def page(title, *supp):
+def page(title, supp=None):
     os.system("cls")
     print("\n", "-"*30, " PAGE {} ".format(title), "-"*30, "\n")
     if supp:
         print("- - - - {} - - - -".format(supp))
-class DbUser(db.Database):
-    """class that manage the _connection to the database and the fonction related to db"""
 
-    COLUMNS = 'name, labels, additives, packagings,nutrition_grade, nova_group, traces, manufacturing_places_tags,\
-    minerals_tags, palm_oil, composition, link, quantity, brands, nutriments'
+class DbUser(Database):
+    """This class manages the connection to the table user"""
+
+    COLUMNS = 'name, labels, additives, packagings,nutrition_grade, nova_group, traces, '\
+    'manufacturing_places_tags, minerals_tags, palm_oil, composition, link, quantity, '\
+    'brands, nutriments'
 
 
     def _registration(self, user):
@@ -95,9 +96,8 @@ class DbUser(db.Database):
             user.pseudo = input("\n  Pseudo : ")
             user.password = input("  Mot de passe : ")
 
-        while True:
-
-            #no need to use the try expression
+        loop = True
+        while loop:
             sql = "SELECT password FROM user WHERE pseudo = '{}';".format(user.pseudo)
             self.my_cursor.execute(sql)
             resultat = self.my_cursor.fetchone()
@@ -111,8 +111,7 @@ class DbUser(db.Database):
                     user_id = self.my_cursor.fetchone()
                     user.id = user_id[0]
                     return user
-                else:
-                    print("\nMot de passe incorrect ! ")
+                print("\nMot de passe incorrect ! ")
             else:
                 print("\nPseudo inconnu : {} ".format(user.pseudo))
 
@@ -187,23 +186,21 @@ class DbUser(db.Database):
         print("Voici les précédentes recherches que vous avez effectuées : \n")
 
         try:
-            sql = """SELECT DATE_FORMAT(Search.day_date, '%c-%b-%y %H:%i'),
-                            Product.category,
-                            Product.name,
-                            Search.criterion,
-                            (SELECT Product.name FROM Product WHERE id = Search.substitute_id) FROM Search
-            INNER JOIN Product ON Search.product_id = Product.id
-            WHERE Search.user_id = '{}' ORDER BY 'date' DESC;""".format(user.id)
+            sql = "SELECT DATE_FORMAT(Search.day_date, '%c-%b-%y %H:%i') AS date,"\
+            "prod.category, prod.name as product, Search.criterion, sub.name as substitute "\
+            "FROM Search INNER JOIN Product AS prod ON Search.product_id = prod.id "\
+            "INNER JOIN Product AS sub ON Search.substitute_id = sub.id "\
+            "WHERE Search.user_id = {} ORDER BY 'date' DESC;".format(user.id)
 
             self.my_cursor.execute(sql)
             resultat = self.my_cursor.fetchall()
-            if resultat == [] :
+            if resultat == []:
                 return "Aucun résultat trouvé dans votre historique de recherche."
             chain = "- "*35
             chain += "\n"
             chain += "  Date | Categorie | Produit | Critère | Substitut\n"
             for i in resultat:
-                chain +=  " {} | {} | {} | {} | {} ".format(i[0], i[1], i[2], i[3], i[4])
+                chain += " {} | {} | {} | {} | {} ".format(i[0], i[1], i[2], i[3], i[4])
                 chain += "\n"
                 chain += "* "*35
                 chain += "\n"
@@ -211,40 +208,3 @@ class DbUser(db.Database):
             return chain
         except Exception as error:
             raise error
-
-    def get_more_info(self, user):
-        """User chooses a prod or a sub and give 1 word (or more), functions makes a search"""
-        os.system("cls")
-        print("\n", "-"*20, " PAGE D'AFFICHAGE DE LA FICHE D'UN SUBSTITUT ", "-"*20, "\n")
-        while True:
-            given_word = input("\nDonnez moi un élément pour la recherche :\n ->")
-
-            sql = 'SELECT Substitute.name, Substitute.category, '\
-            'GROUP_CONCAT(Label.name),GROUP_CONCAT(Brand.name),Substitute.link FROM Substitute '\
-            'INNER JOIN Search ON Search.substitute_id = Substitute.id '\
-            'INNER JOIN Label ON Label.substitute_id = Substitute.id '\
-            'INNER JOIN Brand ON Brand.substitute_id = Substitute.id '\
-            'WHERE Search.user_id = {} AND Substitute.name LIKE "%{}%";'.format(user.id, given_word)
-
-            try: #necessary because resultat[0] can raise an error
-                resultat = self.my_cursor.execute(sql)
-                resultat = self.my_cursor.fetchall()
-                tup = resultat[0]
-                sheet = sub.Substitute(tup[0], tup[1], tup[2], tup[3], tup[4])
-                input("{} \nTouche 'entrer' pour continuer".format(sheet))
-                return True
-
-            except:
-                while True:
-                    action = input("\n---------- Erreur ----------\nLa recherche n'a rien donné."\
-                        " Vous devriez vérifier revenir au menu pour vérifier votre "\
-                        "historique de recherche.\n"\
-                        "Que voulez-vous faire ?\n"\
-                        "  1 - Donner un autre mot,\n"\
-                        "  2 - Revenir au ménu principal. \n")
-                    if action == "1":
-                        break
-                    elif action == "2":
-                        return True
-                    else:
-                        print("Je n'ai pas compris ! ")
