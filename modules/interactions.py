@@ -120,4 +120,12 @@ class Interactions():
                     return answer
                 self.negatif_feed_back("Réponse attendue 1, 2 ou 3 ! ")
 
-
+    def get_criterion()
+        while criterion not in ["1", "2", "3"]:
+            criterion = input("Je vais essayer de vous trouver un substitut à ce produit qui sera"\
+            "soit :\n1/ Meilleur pour votre santé,\n2/ Respectueux de l'environnement."\
+            "\n3/ Revenir au menu\n>")
+            if criterion not in ["1", "2", "3"]:
+                self.negatif_feed_back("Réponse attendue 1 ou 2.")
+            else:
+                return criterion

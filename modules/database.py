@@ -311,12 +311,8 @@ class Database(Interactions):
 
         self.display_title(title)
 
-        while criterion not in ["1", "2", "3"]:
-            criterion = input("Je vais essayer de vous trouver un substitut à ce produit qui sera"\
-            "soit :\n1/ Meilleur pour votre santé,\n2/ Respectueux de l'environnement."\
-            "\n3/ Revenir au menu\n>")
-            if criterion not in ["1", "2", "3"]:
-                self.negatif_feed_back("Réponse attendue 1 ou 2.")
+        self.get_criterion()
+
         #2
         if criterion == "3":
             print("Retour au menu principal ! ")
