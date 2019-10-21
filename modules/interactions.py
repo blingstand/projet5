@@ -17,6 +17,10 @@ class Interactions():
         print("\n", msg, "\n")
         time.sleep(1)
 
+    def non_connected_warning(self):
+        print("ATTENTION : vous n'êtes pas connecté, aucune sauvegarde de"\
+                    " recherche n'aura lieue !\n")
+
     def display_title(self, msg):
         """ displays a title a the top of the page """
         os.system("cls")
@@ -32,7 +36,7 @@ class Interactions():
             print("\t{} -> {}".format(count, i))
             count += 1
         print("** ** "*9)
-        print("     ----- 21 : Revenir au menu principal -----")
+        print("     ----- 21 : Revenir au menu principal. -----")
         print("** ** "*9)
         ind = input(">")
 
@@ -45,8 +49,7 @@ class Interactions():
         #loop in order to repeat the input question until an acceptable answer
             self.display_title("Choisir une catégorie")
             if not my_user.connected:
-                print("/!\ ATTENTION : vous n'êtes pas connecté, aucune sauvegarde "\
-                        "de recherche n'aura lieue !\n")
+                self.non_connected_warning()
             ind = self.input_cat_prod("catégorie", self.TUP_CATEGORY) #input for cat
             answer = self._check_answer(ind, self.TUP_CATEGORY,\
                 "Un nombre entre 1 et 21 est attendu ! ")
@@ -120,12 +123,38 @@ class Interactions():
                     return answer
                 self.negatif_feed_back("Réponse attendue 1, 2 ou 3 ! ")
 
-    def get_criterion()
+    def get_criterion(self):
+        criterion = ""
         while criterion not in ["1", "2", "3"]:
             criterion = input("Je vais essayer de vous trouver un substitut à ce produit qui sera"\
             "soit :\n1/ Meilleur pour votre santé,\n2/ Respectueux de l'environnement."\
-            "\n3/ Revenir au menu\n>")
+            "\n3/ Revenir au menu.\n>")
             if criterion not in ["1", "2", "3"]:
                 self.negatif_feed_back("Réponse attendue 1 ou 2.")
             else:
                 return criterion
+
+    def show_text1(self, validate, substitute, lower_ns, lower_na, cat):
+        if validate:
+            print("\n", "***"*20, "\n\nJe recommande de garder {}.\n>Il a un nutriscore de {} "\
+            "et possède le moins d'additifs ({})\n dans sa catégorie ({}).".\
+            format(substitute, lower_ns, lower_na, cat), "\n\n", "***"*20,)
+        else:
+            print("\n", "***"*20, "\n\nJe recommande ce produit : {}.\n"\
+                "> Il a un nutriscore de {} et possède le moins d'additifs ({})\n "\
+                "dans sa catégorie ({}).".format(substitute, lower_ns, lower_na, cat),\
+                "\n\n", "***"*20,)
+
+    def show_text2(self, sub, name_prod, tup, index, cat):
+        if sub:
+            if sub == name_prod:
+                print("Vous avez demandé un '{}',je vous conseille de garder {}."\
+                    .format(tup[index], sub))
+            else:
+                print("Vous avez demandé un '{}', je vous conseille plutôt {}."\
+                    .format(tup[index], sub))
+        else:
+            sub = name_prod
+            print("Aucun substitut trouvé pour cette catégorie ({}).\n"\
+                "Vous pouvez garder {} dans l'attente de nouveaux produits"\
+                " dans la base\n".format(cat, sub))

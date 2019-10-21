@@ -34,7 +34,7 @@ class Database(Interactions):
         sql = 'select name from product where category = "{}";'.format(cat)
         self.my_cursor.execute(sql)
         my_result = self.my_cursor.fetchall()
-        print(type(my_result))
+
 
         list_prod = [prod[0] for prod in my_result]
 
@@ -49,8 +49,7 @@ class Database(Interactions):
         #loop in order to repeat the input question until an acceptable answer
             self.display_title("Choisir un produit")
             if not my_user.connected:
-                print("ATTENTION : vous n'êtes pas connecté, aucune sauvegarde de "\
-                    " recherche n'aura lieue !\n")
+                self.non_connected_warning()
             ind = self.input_cat_prod("produit", list_prod) #input for cat
             answer = self._check_answer(ind, list_prod, "Un nombre entre 1 et 21 est attendu ! ")
 
@@ -81,12 +80,7 @@ class Database(Interactions):
             return False
 
     def __find_list_low_ns(self, cat, name_selected_prod):
-        """ Returns a list of prod with the lowest letter for nbs
-            1/ for each prod of my_results checks the nbs
-            2/ gets lower => the lower letter of the list
-            3/ for each prod of my_results checks wether their nbs == lower
-            4/ appends the good ones in list_low_ns
-            5/ returns list
+        """ Returns a list of prod with the lowest letter for nutriscore
         """
         sql = 'select name, nutrition_grade, nb_additives from product where category = "{}";'\
             .format(cat)
@@ -96,7 +90,7 @@ class Database(Interactions):
         ns_selected_prod = self._get_info_selected_prod(name_selected_prod, "nutrition_grade")
 
         lower_ns = ns_selected_prod
-        list_low_ns = [] #stock all the prod with a lower_ns nbs
+        list_low_ns = [] #stock all the prod with a lower_ns nutriscore
 
         for prod in my_results:            #1 -------------
             if prod[1] < lower_ns:
@@ -131,12 +125,10 @@ class Database(Interactions):
 
     def __test_if_healthier(self, name_selected_prod, lower_ns, lower_na):
         """ Tests if my prod is healthier than sub and returns True or False"""
-        nbs = self._get_info_selected_prod(name_selected_prod, "nutrition_grade")
-        nba = self._get_info_selected_prod(name_selected_prod, "nb_additives")
-
-
-        if nbs <= lower_ns and nba <= lower_na:
-            return True, name_selected_prod, nbs, nba
+        nutriscore = self._get_info_selected_prod(name_selected_prod, "nutrition_grade")
+        nb_add = self._get_info_selected_prod(name_selected_prod, "nb_additives")
+        if nutriscore <= lower_ns and nb_add <= lower_na:
+            return True, name_selected_prod, nutriscore, nb_add
         return False, None, None, None
 
     def _find_healthy_sub(self, cat, name_selected_prod):
@@ -194,10 +186,10 @@ class Database(Interactions):
 
         return substitute, precision
 
-    def _display_answer(self, cat, name_selected_prod, criterion):
+    def _get_a_sub(self, cat, name_selected_prod, criterion):
         """ Tries to find a substitute based on criterion
 
-            for health : NutriScore(nbs) and Additives
+            for health : NutriScore(nutriscore) and Additives
             for Environnement
         """
         self.display_title("Affichage du substitut")
@@ -206,15 +198,7 @@ class Database(Interactions):
             validate, substitute, lower_ns, lower_na = self._find_healthy_sub(cat, \
                 name_selected_prod)
             self.display_title("Affichage de la réponse")
-            if validate:
-                print("\n", "***"*20, "\n\nJe recommande de garder {}.\n>Il a un nutriscore de {} "\
-                "et possède le moins d'additifs ({})\n dans sa catégorie ({}).".\
-                format(substitute, lower_ns, lower_na, cat), "\n\n", "***"*20,)
-            else:
-                print("\n", "***"*20, "\n\nJe recommande ce produit : {}.\n"\
-                    "> Il a un nutriscore de {} et possède le moins d'additifs ({})\n "\
-                    "dans sa catégorie ({}).".format(substitute, lower_ns, lower_na, cat),\
-                    "\n\n", "***"*20,)
+            self.show_text1(validate, substitute, lower_ns, lower_na, cat)
 
         elif criterion == "2":
             substitute, precision = self._get_type_resp_sub(cat, name_selected_prod)
@@ -223,19 +207,8 @@ class Database(Interactions):
             index = int(precision) - 1 #index starts at 0
             criterion = criterion + precision
             self.display_title("Affichage de la réponse")
+            self.show_text2(substitute, name_selected_prod, self.TUP_PRECISION, index, cat)
 
-            if substitute:
-                if substitute == name_selected_prod:
-                    print("Vous avez demandé un '{}',je vous conseille de garder {}."\
-                        .format(self.TUP_PRECISION[index], substitute))
-                else:
-                    print("Vous avez demandé un '{}', je vous conseille plutôt {}."\
-                        .format(self.TUP_PRECISION[index], substitute))
-            else:
-                substitute = name_selected_prod
-                print("Aucun substitut trouvé pour cette catégorie ({}).\n"\
-                    "Vous pouvez garder {} dans l'attente de nouveaux produits"\
-                    " dans la base\n".format(cat, substitute))
         if criterion in ["0", "1", "21", "22", "23"]:
             return substitute, criterion
         input("il y a un pb =(")
@@ -305,30 +278,23 @@ class Database(Interactions):
         4/  Write the informations concerning the search in the db
 
         """
-        #1
         criterion = "",
         title = "Recherche d'un substitut à ce produit {} ({})".format(name_selected_prod, cat)
-
         self.display_title(title)
-
-        self.get_criterion()
-
-        #2
+        criterion = self.get_criterion()
         if criterion == "3":
             print("Retour au menu principal ! ")
             time.sleep(1)
             return "menu"
 
-        sub, criterion = self._display_answer(cat, name_selected_prod, criterion)
+        sub, criterion = self._get_a_sub(cat, name_selected_prod, criterion)
         if sub == "menu":
             print("Retour au menu principal ! ")
             time.sleep(1)
             return "menu"
 
-        #3
         self.describ_sub(sub)
 
-        #
         if my_user.connected:
             self._save_search(cat, name_selected_prod, sub, my_user, criterion)
         return sub
