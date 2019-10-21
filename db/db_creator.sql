@@ -18,8 +18,6 @@ CREATE TABLE User (
     PRIMARY KEY (id)
 )ENGINE = INNODB;
 
-
-
 CREATE TABLE Product (
     id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
     category VARCHAR(60) NOT NULL,
@@ -42,6 +40,10 @@ CREATE TABLE Product (
     PRIMARY KEY (id)
 )ENGINE = INNODB;
 
+CREATE INDEX product_idx
+ ON product
+ ( name );
+
 -- la dernière porte les clés étangères
 CREATE TABLE Search (
     user_id SMALLINT UNSIGNED NOT NULL,
@@ -49,18 +51,8 @@ CREATE TABLE Search (
     substitute_id SMALLINT UNSIGNED NOT NULL,
     day_date TIMESTAMP,
     criterion INT,
-    PRIMARY KEY (user_id, product_id),
+    PRIMARY KEY (user_id, product_id, substitute_id),
     CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES Product(id),
     CONSTRAINT fk_sub_id FOREIGN KEY (substitute_id) REFERENCES Product(id),
     CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES User(id)
 )ENGINE = INNODB;
-
-
-
-
-SELECT DATE_FORMAT(Search.day_date, '%c-%b-%y %H:%i') AS date,
-prod.category, prod.name as product, Search.criterion, sub.name as substitute
-FROM Search
-    INNER JOIN Product AS prod ON Search.product_id = prod.id
-    INNER JOIN Product AS sub ON Search.substitute_id = sub.id
-WHERE Search.user_id = {} ORDER BY 'date' DESC;

@@ -251,8 +251,8 @@ class Database(Interactions):
         return None
 
     def _check_presence_before_insert(self, user_id, substitute_id, product_id, criterion):
-        sql = 'SELECT * FROM Search WHERE user_id="{}" AND substitute_id={}'\
-        ' AND product_id="{}" AND criterion = {};'\
+        sql = 'SELECT * FROM Search WHERE user_id = {} AND substitute_id = {}'\
+        ' AND product_id = {} AND criterion = {};'\
         .format(user_id, substitute_id, product_id, criterion)
         self.my_cursor.execute(sql)
         my_result = self.my_cursor.fetchone()
@@ -266,7 +266,7 @@ class Database(Interactions):
         user_id = my_user.id
         timestamp = datetime.today()
         can_insert = self._check_presence_before_insert(user_id, \
-            substitute_id, name_selected_prod, criterion)
+            substitute_id, product_id, criterion)
         if can_insert:
             sql = 'INSERT INTO Search (user_id, substitute_id, day_date, '\
             'product_id, criterion) VALUES ({}, {}, "{}", {}, {});'\
@@ -277,7 +277,7 @@ class Database(Interactions):
             print("... recherche enregistrée ...")
         else:
             sql = "UPDATE Search SET day_date = '{}' WHERE product_id = {} AND substitute_id = {} "\
-            "AND criterion = {};".format(timestamp, substitute_id, criterion)
+            "AND criterion = {};".format(timestamp, product_id, substitute_id, criterion)
             self.my_cursor.execute(sql)
             self.mydb.commit()
             print("... historique de recherche mise à jour ...")
@@ -335,6 +335,7 @@ class Database(Interactions):
         #
         if my_user.connected:
             self._save_search(cat, name_selected_prod, sub, my_user, criterion)
+        return sub
 
     def display_more_info_about_product(self, name_selected_prod):
         """ Displays informations about selected prod comming from the db """

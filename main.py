@@ -23,7 +23,7 @@ def main():
     # " de vous montrer que parmi des produits du quotidien vous pouvez trouver un "\
     # "substitut dont la fabrication est respectueuse de l'environnement.\n")
 
-    my_user = us.User()
+    my_user = us.User("tom", "123", True)
     # input(my_user.id)
     loop = True
     while loop:
@@ -74,12 +74,12 @@ def main():
                 selected_prod = choice.display_choice_prod(my_user, selected_cat)
                 if selected_prod == "menu":
                     break
-                stop = choice.compare_prod_with_sub(selected_cat, selected_prod, my_user)
-                if stop == "menu":
+                sub = choice.compare_prod_with_sub(selected_cat, selected_prod, my_user)
+                if sub == "menu":
                     break
                 after_search = choice.after_search("3")
                 if after_search == "1":
-                    url = choice.display_more_info_about_product(selected_prod)
+                    url = choice.display_more_info_about_product(sub)
                     webbrowser.open_new(url)
                     after_web = choice.after_search("2")
                     if after_web == "2":
