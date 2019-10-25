@@ -178,6 +178,7 @@ class FillDb():
 
         self.my_cursor.execute(sql)
         # self.mydb.commit() #has to commit the change
+
 def main():
     before = datetime.now()
     products = FillDb()
